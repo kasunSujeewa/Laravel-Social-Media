@@ -19,6 +19,7 @@ class CreateFriendRequestsTable extends Migration
 
             $table->foreign('user_id')->references('id')->on('users');
             $table->bigInteger('friend_id');
+            $table->boolean('status')->default(false);
             $table->timestamps();
         });
     }

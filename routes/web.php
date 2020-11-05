@@ -31,5 +31,6 @@ Route::group(['middleware'=> 'auth'],function(){
     Route::post('/confirmRq','FriendRequestController@confirm');
     Route::post('/deleteRq','FriendRequestController@remove');
     Route::post('/deletefr','FriendsController@removefr');
+    Route::post('/deletecom','CommentController@delcom');
     
 });

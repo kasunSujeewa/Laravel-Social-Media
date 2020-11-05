@@ -9,7 +9,7 @@
 
     <title>SUSL Social</title>
 
-    
+
 
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
@@ -50,9 +50,10 @@
 	border-right-color:#ddd;
 	border-width:8px;
 }
-   
-   
+
+
    </style>
+   
 </head>
 <body>
     <div id="app">
@@ -90,6 +91,24 @@
                                 </li>
                             @endif
                         @else
+                        <li class="nav-item dropdown">
+                            <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                            Notifications <i class="fa fa-bell-o" aria-hidden="true"></i><span class="badge badge-danger">{{Auth ::user()->unreadNotifications->count()}}</span> <span class="caret"></span>
+                            </a>
+
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                               @if(empty(Auth ::user()->unreadNotifications->count()))
+                               <span>You haven't Notfications</span>
+                               @else
+                               @foreach (Auth::user()->unreadNotifications as $item)
+                                   <ul class="dropdown-item">
+                                   <li class="noty m-0 bg-warning"><a href="/posts/{{$item->data['post_id']}}">{{$item->data['body']}}</a></li>
+
+                                   </ul>
+                               @endforeach
+                               @endif
+                            </div>
+                        </li>
                             <li class="nav-item dropdown">
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                     {{ Auth::user()->name }} <span class="caret"></span>
@@ -112,7 +131,7 @@
                 </div>
             </div>
         </nav>
-        
+
 
         <main class="py-4">
             @yield('content')
@@ -134,7 +153,7 @@
         <div class="form-group">
             <label for="exampleInputEmail1">Post Name</label>
             <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="" name="postName" required>
-           
+
         </div>
         <div class="form-group">
             <label for="exampleFormControlTextarea1">Description</label>
@@ -145,7 +164,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        
+
       </div>
     </div>
   </div>
@@ -168,7 +187,7 @@
         <div class="form-group">
             <label for="exampleInputEmail1">Post Name</label>
             <input type="text" class="form-control" id="postName1"   name="postName" required>
-           
+
         </div>
         <div class="form-group">
             <label for="exampleFormControlTextarea1">Description</label>
@@ -179,7 +198,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        
+
       </div>
     </div>
   </div>
@@ -195,19 +214,19 @@
         </button>
       </div>
       <div class="modal-body">
-      
+
       <form id="product-delete-form">
         @csrf
-        
-        
+
+
        <input type="hidden" id="postid1">
         <button type="submit" class="btn btn-danger">Delete</button>
         </form>
       </div>
       <div class="modal-footer">
-      
+
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        
+
       </div>
     </div>
   </div>
@@ -237,56 +256,56 @@
         <div class="form-group">
             <label for="exampleInputEmail1">Comment</label>
             <input type="text" class="form-control" id="comment1" aria-describedby="emailHelp" placeholder="comment here..." name="comment" required>
-           
+
         </div>
-        
+
         <button type="submit" class="btn btn-sm btn-primary">Add comment</button>
         </form>
       </div>
       <div class="modal-footer">
-      
+
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        
+
       </div>
     </div>
   </div>
 </div>
-    
+
     <script src="{{asset('js/app.js')}}"></script>
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
     <script >
     // edit post
     $(document).ready(function () {
     $('#Edit_post').on('show.bs.modal', function (event) {
-        
-        
-       
+
+
+
   var button = $(event.relatedTarget) // Button that triggered the modal
   var title = button.data('postname') // Extract info from data-* attributes
   var description = button.data('postdescription') // Extract info from data-* attributes
   var id = button.data('postid') // Extract info from data-* attributes
   // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
   // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
-  
+
   var modal = $(this)
-  
+
   modal.find('.modal-body #postName1').val(title);
   modal.find('.modal-body #postDescription').val(description);
   modal.find('.modal-body #postid').val(id);
 //   var submitUrl = '/posts/' + id,
 //   form = $('#product-update-form');
 //   form.attr('action', submitUrl);
-        
 
-  
-      
-  
+
+
+
+
     });
 
     $('#product-update-form').on('submit', function(e){
         e.preventDefault();
      var id= $('#postid').val();
-     
+
      $.ajax({
          type:"PATCH",
          url:"/posts/"+id,
@@ -296,7 +315,7 @@
              $('#Edit_post').modal('hide');
              swal("Updated..!", "Its Done", "success");
              location.reload();
-             
+
          },
          error:function(error){
              console.log(error);
@@ -305,46 +324,46 @@
     });
     // Delete post
     $('#Delete_post').on('show.bs.modal', function (event){
-         
+
         var button = $(event.relatedTarget) // Button that triggered the modal
   var idnew = button.data('postid')
-  
+
   var modal = $(this)
-  
+
   modal.find('.modal-body #postid1').val(idnew);
     });
   $('#product-delete-form').on('submit', function(e){
         e.preventDefault();
      var id= $('#postid1').val();
      console.log(id);
-     
-     
-     
+
+
+
      $.ajax({
          type:"DELETE",
          url:"/posts/" + id,
          data:$('#product-delete-form').serialize(),
-         
+
          success: function(response){
              console.log(response);
              $('#Delete_post').modal('hide');
              swal("Deleted..!", "Its Done", "success");
              location.reload();
-             
-             
+
+
          },
          error:function(error){
              console.log(error);
-             
+
          }
-         
+
     });
     });
     //posting
     $('#post-form').on('submit', function(e){
         e.preventDefault();
-     
-     
+
+
      $.ajax({
          type:"POST",
          url:"/posts",
@@ -354,7 +373,7 @@
              $('#add_post').modal('hide');
              swal("Post Created..!", "Its Done", "success");
              location.reload();
-             
+
          },
          error:function(error){
              console.log(error);
@@ -363,9 +382,9 @@
     });
     //profile_update
     $('#Update_details').on('show.bs.modal', function (event) {
-        
-        
-        console.log('its work');  
+
+
+        console.log('its work');
     var button = $(event.relatedTarget) // Button that triggered the modal
     var id = button.data('userid') // Extract info from data-* attributes
     var faculty = button.data('faculty') // Extract info from data-* attributes
@@ -373,10 +392,10 @@
     var department = button.data('department') // Extract info from data-* attributes
     var about = button.data('about') // Extract info from data-* attributes
     var school = button.data('school') // Extract info from data-* attributes
-    
-    
+
+
      var modal = $(this)
-    
+
     modal.find('.modal-body #faculty').val(faculty);
     modal.find('.modal-body #about').val(about);
     modal.find('.modal-body #dob').val(dob);
@@ -386,17 +405,17 @@
   //   var submitUrl = '/posts/' + id,
   //   form = $('#product-update-form');
   //   form.attr('action', submitUrl);
-          
-  
-    
-        
-    
+
+
+
+
+
       });
-  
+
       $('#Update-detail-form').on('submit', function(e){
           e.preventDefault();
        var id= $('#user_id').val();
-       
+
        $.ajax({
            type:"POST",
            url:"/profile/"+id,
@@ -406,7 +425,7 @@
                $('#Update_details').modal('hide');
                swal("Updated..!", "Its Done", "success");
                location.reload();
-               
+
            },
            error:function(error){
                console.log(error);
@@ -418,7 +437,7 @@ $('.like').on('click', function(event) {
     event.preventDefault();
     postId = event.target.parentNode.dataset['postid'];
     var isLike = event.target.previousElementSibling == null;
-    
+
     $.ajax({
         method: 'POST',
         url: '/like',
@@ -441,28 +460,28 @@ $('#comment_modal').on('show.bs.modal', function (event) {
   var postId = button.data('idone')
   var postName= button.data('postname')
   var postDescription= button.data('postdescription')
-  
+
     var modal = $(this)
     modal.find('.modal-body #postId3').val(postId);
     modal.find('.modal-body #post_name').val(postName);
     modal.find('.modal-body #post_description').val(postDescription);
-    
+
 });
 $('#comment-form').on('submit', function(e){
           e.preventDefault();
-          
-       
-       
+
+
+
        $.ajax({
            type:"POST",
            url:"/comment",
            data:$('#comment-form').serialize(),
            success: function(response){
-               
+
                $('#comment_model').modal('hide');
-               
+
                location.reload();
-               
+
            },
            error:function(error){
                console.log(error);
@@ -471,9 +490,9 @@ $('#comment-form').on('submit', function(e){
       });
       $('#comment-form1').on('submit', function(e){
           e.preventDefault();
-          
-       
-       
+
+
+
        $.ajax({
            type:"POST",
            url:"/comment",
@@ -488,7 +507,7 @@ $('#comment-form').on('submit', function(e){
       });
 $('.addrequest').on('click',function(event){
     event.preventDefault();
-    
+
     var frdid= event.target.parentNode.parentNode.dataset['usrid'];
   var class1=event.target.classList[0];
   if(event.target.innerHTML=="Add friend"){
@@ -504,9 +523,9 @@ $('.addrequest').on('click',function(event){
            }
    }).done(function(){
     event.target.innerHTML="Add friend" ? 'request send' : 'Add friend';
-     
-     
-     
+
+
+
 
    })
   }
@@ -523,19 +542,19 @@ $('.addrequest').on('click',function(event){
            }
    }).done(function(){
      event.target.innerHTML="request send" ? 'Add friend' : 'request send';
-     
 
-     
+
+
 
    })
 
   }
-  
+
 });
 $('.confirm').on('click',function(e){
   e.preventDefault();
   var friend_id=e.target.parentElement.parentElement.dataset.usrid;
- 
+
   $.ajax({
     type:"POST",
     url:"/confirmRq",
@@ -552,7 +571,7 @@ $('.confirm').on('click',function(e){
 $('.remove').on('click',function(e){
   e.preventDefault();
   var friend_id=e.target.parentElement.parentElement.dataset.usrid;
- 
+
   $.ajax({
     type:"POST",
     url:"/deleteRq",
@@ -569,40 +588,65 @@ $('.remove').on('click',function(e){
 $('.removefr').on('click',function(e){
   e.preventDefault();
   var friend_id=e.target.parentElement.parentElement.dataset.usrid;
-  console.log(friend_id);
- 
+
+
   $.ajax({
     type:"POST",
     url:"/deletefr",
     data:{friend_id:friend_id, "_token": "{{ csrf_token() }}"},
     success:function(response){
-      console.log(response);
+      console.log('removed');
+      location.reload();
     },
     error:function(error){
                console.log(error);
            }
 
   })
-})
+});
+$('.delcom').on('click',function(e){
+  e.preventDefault();
+  var comment_id=e.target.parentElement.parentElement.parentElement.dataset.comment_id;
 
 
-      
+  $.ajax({
+    type:"POST",
+    url:"/deletecom",
+    data:{comment_id:comment_id, "_token": "{{ csrf_token() }}"},
+    success:function(response){
+      console.log("deleted");
+      location.reload();
+    },
+    error:function(error){
+               console.log(error);
+           }
 
-
-    
+  })
 });
 
 
-  
 
 
 
 
-    
-    
+
+});
+window.Echo.private('App.User.' + this.userId)
+    .notification((notification) => {
+        console.log(notification);
+    });
+
+
+
+
+
+
+
+
+
     </script>
-    
-   
-    
+
+
+
 </body>
 </html>

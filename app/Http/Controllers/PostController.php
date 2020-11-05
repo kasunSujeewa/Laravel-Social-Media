@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Post;
 use App\Like;
 use App\Comment;
@@ -20,15 +21,33 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts = Post::orderBy('created_at','desc')->paginate(5);
-        $like = Like::all();
-        $user = User::where('id','!=', Auth::user()->id)->get();
-    
-   
-        $friend_req=FriendRequest::where('friend_id',Auth::user()->id)->get();
-        $friends=Friends::where('user_id',Auth::user()->id)->orWhere('friend_id',Auth::user()->id)->get();
-      
-        return view('home')->with('posts',$posts)->with('like',$like)->with('user',$user)->with('friend_rq',$friend_req)->with('friends',$friends);
+        if ((Auth::user()->friends->count()) > 0) {
+            $collection = collect(Auth::user()->friends->pluck('friend_id'));
+            $collection->push(Auth::user()->id);
+
+            $posts = Post::whereIn('user_id', $collection)->orderBy('created_at', 'desc')->paginate(15);
+            $like = Like::all();
+            $user = User::where('id', '!=', Auth::user()->id)->get();
+
+
+
+            $friend_req = Auth::user()->friendRequestsReceive->where('status', false)->all();
+
+            $friends = Friends::where('friend_id', Auth::user()->id)->get();
+            return view('home')->with('posts', $posts)->with('like', $like)->with('user', $user)->with('friend_rq', $friend_req)->with('friends', $friends);
+        } else {
+            $collection = ([Auth::user()->id]);
+            $posts = Post::whereIn('user_id', $collection)->orderBy('created_at', 'desc')->paginate(15);
+            $like = Like::all();
+            $user = User::where('id', '!=', Auth::user()->id)->get();
+
+
+
+            $friend_req = Auth::user()->friendRequestsReceive->where('status', false)->all();
+
+            $friends = Friends::where('friend_id', Auth::user()->id)->get();
+            return view('home')->with('posts', $posts)->with('like', $like)->with('user', $user)->with('friend_rq', $friend_req)->with('friends', $friends);
+        }
     }
 
     /**
@@ -49,10 +68,10 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        $posts= new Post;
-        $posts->user_id=Auth::user()->id;
-        $posts->postName=$request->postName;
-        $posts->description=$request->description;
+        $posts = new Post;
+        $posts->user_id = Auth::user()->id;
+        $posts->postName = $request->postName;
+        $posts->description = $request->description;
         $posts->save();
         // $posts->all();
         // return redirect('/posts');
@@ -66,10 +85,11 @@ class PostController extends Controller
      */
     public function show($id)
     {
-        $post=Post::find($id);
-        $like=$post->likes->all();
-        $comments=$post->comments->all();
-        return view('Post.Post')->with('post',$post)->with('likes',$like)->with('comments',$comments);
+        $post = Post::find($id);
+        $like = $post->likes->all();
+        $comments = $post->comments->all();
+        auth()->user()->unreadNotifications->markAsRead();
+        return view('Post.Post')->with('post', $post)->with('likes', $like)->with('comments', $comments);
     }
 
     /**
@@ -80,7 +100,6 @@ class PostController extends Controller
      */
     public function edit($id)
     {
-        
     }
 
     /**
@@ -90,12 +109,11 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request,$id)
+    public function update(Request $request, $id)
     {
-        $post=POST::findOrFail($id);
+        $post = POST::findOrFail($id);
         $post->update($request->all());
         $post->save();
-        
     }
 
     /**
@@ -106,10 +124,9 @@ class PostController extends Controller
      */
     public function destroy($id)
     {
-        $post=POST::findOrFail($id);
+        $post = POST::findOrFail($id);
         $post->likes()->forceDelete();
         $post->comments()->forceDelete();
         $post->delete();
-
     }
 }

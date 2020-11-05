@@ -59,19 +59,22 @@
                     @foreach($comments as $comment)
                     <ul class="media-list m-3" style="margin-left:-30px" >
                         <li class="media"style="border-bottom:1px dashed #efefef;margin-left:-30px" >
-                            <a href="#" class="pull-left m-1S">
+                            <a href="#" class="pull-left m-1S" style="padding-right:10spx">
                                 <img style=" width:64px;height:64px;border:2px solid #e5e7e8;"
                                  src="{{Storage::url($comment->user->avatar)}}" alt="" class="rounded-circle">
                             </a>
-                            <div class="media-body">
+                            <div class="media-body" data-comment_id="{{$comment->id}}">
                                 <span class="text-muted pull-right">
                                     <small class="text-muted">{{ $comment->created_at->diffForHumans() }}</small>
                                 </span>
                                 <strong class="text-success">{{ucfirst($comment->user->name)}}</strong>
                                 <p>
                                     {{$comment->comment}}
+                                    @if(Auth::user()->id==$comment->user->id)
+                               <span class="badge badge-light"><a href="" class="delcom">Delete</a></span>
+                               @endif
                                 </p>
-                               
+                                
                             </div>
                             </ul>
                     @endforeach

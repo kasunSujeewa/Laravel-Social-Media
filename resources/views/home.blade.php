@@ -18,11 +18,12 @@
 @if(isset($posts))
 @foreach($posts as $post)
 <div class="card gedf-card" style="margin-top: 0.97rem;" id="dataOne">
-                    
+
                     <div class="card-header">
-                    
-                    
-                        
+
+
+
+
                             <div class="d-flex justify-content-start align-items-center">
                                 <div class="mr-2">
                                     <img class="rounded-circle" width="45" src="{{Storage::url($post->user->avatar)}}" alt="">
@@ -31,7 +32,7 @@
                                     <div class="h5 m-0"><a href="/profile/{{$post->user->slug}}">{{ucfirst($post->user->name)}}</a></div>
                                     <div class="h7 text-muted">Miracles Lee Cross</div>
                                 </div>
-                            
+
                             @if(Auth::user()==$post->user)
                             <div>
                                 <div class="dropdown">
@@ -41,17 +42,17 @@
                                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="gedf-drop1">
                                         <div class="h6 dropdown-header">Configuration</div>
                                         <button data-toggle="modal" data-target="#Edit_post" data-postname='{{$post->postName}}' data-postdescription='{{$post->description}}' data-postid="{{$post->id}}" id="submit" class="dropdown-item" >Edit</button>
-                                        <button class="dropdown-item" data-postid="{{$post->id}}" data-toggle="modal" data-target="#Delete_post">Delete</button>    
+                                        <button class="dropdown-item" data-postid="{{$post->id}}" data-toggle="modal" data-target="#Delete_post">Delete</button>
                                         <a class="dropdown-item" href="#">Report</a>
                                     </div>
                                 </div>
                             </div>
-                        
+
                         @endif
 
                     </div>
                     </div>
-                    
+
                     <div class="card-body" >
                         <div class="text-muted h7 mb-2"> <i class="fa fa-clock-o"></i>{{ $post->created_at->diffForHumans() }}</div>
                         <a class="card-link" href="/posts/{{$post->id}}">
@@ -66,23 +67,23 @@
                         <small class="m-1 text-muted"><i class="fa fa-commenting" aria-hidden="true"></i>{{$post->comments->count()}}</small>
                     </div>
                     <div class="card-footer" data-postid="{{$post->id}}">
-                    
+
                     <a href="#" class="badge badge-primary like" data-postid="{{$post->id}}">{{ Auth::user()->likes()->where('post_id', $post->id)->first() ?
                      Auth::user()->likes()->where('post_id', $post->id)->first()->status == 1 ? 'Liked' : 'Like' : 'Like'  }}</a>
-                     
+
                <a href="#" class="badge badge-danger like">{{ Auth::user()->likes()->where('post_id', $post->id)->first() ?
                 Auth::user()->likes()->where('post_id', $post->id)->first()->status == 0 ? 'Disliked' : 'Dislike' : 'Dislike'  }}</a>
                 <button  class="btn btn-link comment ml-3 text-decoration-none" data-toggle="modal" data-target="#comment_modal" data-idone="{{$post->id}}" data-postname="{{$post->postName}}" data-postdescription="{{$post->description}}"><i class="fa fa-comment" aria-hidden="true"></i>Comments</button>
                     </div>
-                    
+
                 </div>
-                
+
                 @endforeach
 
 
 
-               
-                
+
+
 <div class="m-3">
 {{ $posts->links() }}
 </div>
@@ -100,29 +101,42 @@
     </div>
 
     <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
-    @foreach($user as $usr)
-            @if(!empty($usr->friend))
-            @else
+
+
+
+
+
+
         <div class="card-body">
-       
+        @if(isset($user))
+    @foreach($user as $usr)
+
+            @if($usr->friends->where('friend_id',Auth::user()->id)->first() )
+
+            @else
+            @if($usr->friendRequestsSend->where('status',false)->where('friend_id',Auth::user()->id)->first())
+            @else
                 <div class="d-flex justify-content-between" data-usrid="{{$usr->id}}">
                     <div class="mr-1">
                         <img class="m-2" src="{{Storage::url($usr->avatar)}}" alt=""width=30px height=30px style="border-radius: 50%;">
                     </div>
                     <div class="mr-1 align-self-center">
                         <h5 >{{$usr->name}}</h5>
-                    </div> 
+                    </div>
                     <div class="mr-1 align-self-center">
-                        <a href="" class="addrequest" style="text-decoration:none">{{Auth::user()->friendRequests()->where('friend_id',$usr->id)->first() ? ' request send' : 'Add friend'}}</a>
-                    </div> 
+                        <a href="" class="addrequest" style="text-decoration:none">{{Auth::user()->friendRequestsSend()->where('friend_id',$usr->id)->first() ? ' request send' : 'Add friend'}}</a>
+                    </div>
                 </div>
-
+                @endif
+                @endif
+         @endforeach
+         @endif
         </div>
-           @endif
-        @endforeach
+
 
     </div>
-  
+
+
     <div class="card">
         <div class="card-header" id="headingTwo">
             <h2 class="mb-0">
@@ -133,23 +147,25 @@
         </div>
         <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionExample">
         <div class="card-body">
+        @if(isset($friend_rq))
         @foreach($friend_rq as $fr)
-        
+
             <div class="d-flex justify-content-between" data-usrid="{{$fr->user->id}}">
                 <div class="mr-1">
                      <img class="m-2" src="{{Storage::url($fr->user->avatar)}}" alt=""width=30px height=30px style="border-radius: 50%;">
                 </div>
                 <div class="mr-1 align-self-center">
                     <h5 >{{$fr->user->name}}</h5>
-                </div> 
+                </div>
                 <div class="mr-1 align-self-center">
                     <a href="" class="confirm" style="text-decoration:none">Confirm</a>
                     <a href="" class="remove" style="text-decoration:none">Delete</a>
-                </div> 
+                </div>
             </div>
         </div>
         @endforeach
-      
+        @endif
+
     </div>
     </div>
 
@@ -163,41 +179,28 @@
     </div>
     <div id="collapseThree" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionExample">
       <div class="card-body">
+        @if(isset($friends))
         @foreach($friends as $fr)
-        @if($fr->user->id==Auth::user()->id)
-        @if($user->where('id',$fr->user_id)!=Auth::user())
+
+
         <div class="card card-footer bg-light"  >
-            <div class="d-flex justify-content-between" data-usrid="{{$fr->user->id}}">
-                <div class="mr-1">
-                     <img class="m-2" src="{{Storage::url($fr->user2->avatar)}}" alt=""width=30px height=30px style="border-radius: 50%;">
-                </div>
-                <div class="mr-1 align-self-center">
-                    <h5 >{{$fr->user2->name}}</h5>
-                </div> 
-                <div class="mr-1 align-self-center">
-                    <a href="" class="removefr" style="text-decoration:none">remove</a>
-                    
-                </div> 
-            </div>
-        </div>
-        @endif
-        @else
-        <div class="card card-footer bg-light"  >
-            <div class="d-flex justify-content-between" data-usrid="{{$fr->user->id}}">
+            <div class="d-flex justify-content-between" data-usrid="{{$fr->user_id}}">
                 <div class="mr-1">
                      <img class="m-2" src="{{Storage::url($fr->user->avatar)}}" alt=""width=30px height=30px style="border-radius: 50%;">
                 </div>
                 <div class="mr-1 align-self-center">
                     <h5 >{{$fr->user->name}}</h5>
-                </div> 
+                </div>
                 <div class="mr-1 align-self-center">
                     <a href="" class="removefr" style="text-decoration:none">remove</a>
-                    
-                </div> 
+
+                </div>
             </div>
         </div>
-        @endif
+
+
         @endforeach
+        @endif
       </div>
   </div>
 </div>
